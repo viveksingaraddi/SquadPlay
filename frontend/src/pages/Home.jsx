@@ -34,7 +34,8 @@ export default function Home() {
           const parts = selectedPlayer.location.split(",");
           const city = parts.length > 1 ? parts[parts.length - 2].trim() : parts[0].trim();
           
-          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/arenas/search?city=${city}`);
+          const API_URL = import.meta.env.VITE_API_URL || "";
+          const res = await fetch(`${API_URL}/api/arenas/search?city=${city}`);
           const data = await res.json();
           if (res.ok) setArenas(data);
         } catch (error) {
@@ -50,7 +51,8 @@ export default function Home() {
   const fetchPlayers = async () => {
     try {
       const { search, game, skill, location } = filters;
-      let url = `${import.meta.env.VITE_API_URL}/api/users?name=${search}&game=${game}&skill=${skill}&location=${location}`;
+      const API_URL = import.meta.env.VITE_API_URL || "";
+      let url = `${API_URL}/api/users?name=${search}&game=${game}&skill=${skill}&location=${location}`;
       
       const res = await fetch(url, {
         headers: {
@@ -78,7 +80,8 @@ export default function Home() {
   const handleSendRequest = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/requests/send`, {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+      const res = await fetch(`${API_URL}/api/requests/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

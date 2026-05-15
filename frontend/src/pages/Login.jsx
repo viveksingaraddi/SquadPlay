@@ -24,7 +24,8 @@ export default function Login() {
         const geoData = await geoRes.json();
         const locationStr = geoData.results[0]?.formatted_address || "Unknown Location";
 
-        await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
+        const API_URL = import.meta.env.VITE_API_URL || "";
+        await fetch(`${API_URL}/api/users/profile`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -53,7 +54,8 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -83,7 +85,8 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+      const res = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,7 +113,8 @@ export default function Login() {
     if (!userEmail) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/forgot-password`, {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+      const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

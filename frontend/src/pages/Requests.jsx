@@ -11,7 +11,8 @@ export default function Requests() {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/requests/received`, {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+      const res = await fetch(`${API_URL}/api/requests/received`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
@@ -27,7 +28,8 @@ export default function Requests() {
 
   const handleStatusUpdate = async (id, status) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/requests/${id}`, {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+      const res = await fetch(`${API_URL}/api/requests/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
