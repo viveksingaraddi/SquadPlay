@@ -41,7 +41,7 @@ export default function Login() {
         storedUser.coordinates = { lat: latitude, lng: longitude };
         localStorage.setItem("user", JSON.stringify(storedUser));
         
-        console.log("PlayMate: Precise location saved.");
+        console.log("SquadPlay: Precise location saved.");
       } catch (err) {
         console.error("Google Geo error:", err);
       }
@@ -135,12 +135,12 @@ export default function Login() {
         <div className="w-1/2 p-10 flex flex-col justify-center">
           
           {/* Logo */}
-          <div className="mb-6 text-xl font-semibold">PlayMate</div>
+          <div className="mb-6 text-xl font-semibold">SquadPlay</div>
 
           {/* Heading */}
           <h1 className="text-3xl font-bold mb-2">
             {isSignup ? "Create Account" : "Welcome Back"} <br />
-            to PlayMate
+            to SquadPlay
           </h1>
 
           <p className="text-gray-500 mb-6">
@@ -237,7 +237,7 @@ export default function Login() {
           <div className="absolute inset-0 bg-black/20"></div>
 
           <div className="absolute top-6 right-6 text-white text-lg font-semibold">
-            PlayMate
+            SquadPlay
           </div>
 
           <div className="absolute bottom-6 left-6 text-white text-sm opacity-70">

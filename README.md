@@ -1,1 +1,1 @@
-# PlayMate
+# SquadPlay
