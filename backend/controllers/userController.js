@@ -11,10 +11,13 @@ const getUsers = async (req, res) => {
     if (skill && skill !== "All skill levels") query.skillLevel = skill.toLowerCase();
     if (location && location !== "Anywhere") query.location = { $regex: location, $options: "i" };
 
+    console.log("Fetching users with query:", JSON.stringify(query));
     const users = await User.find(query).select("-password");
+    console.log("Found " + users.length + " users");
     res.json(users);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error("GetUsers Error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 

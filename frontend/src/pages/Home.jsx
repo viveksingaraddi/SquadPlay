@@ -60,7 +60,9 @@ export default function Home() {
         }
       });
       const data = await res.json();
+      console.log("Fetched players data:", data);
       if (res.ok) setPlayers(data);
+      else console.error("Fetch players failed:", data);
     } catch (error) {
       console.error("Error fetching players:", error);
     }
