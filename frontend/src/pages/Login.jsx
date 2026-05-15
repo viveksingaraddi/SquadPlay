@@ -11,12 +11,49 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // 🔹 GEOLOCATION
+  const requestLocation = async (token) => {
+    if (!("geolocation" in navigator)) return;
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+      try {
+        const geoRes = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_API_KEY}`);
+        const geoData = await geoRes.json();
+        const locationStr = geoData.results[0]?.formatted_address || "Unknown Location";
+
+        await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ 
+            location: locationStr,
+            coordinates: { lat: latitude, lng: longitude }
+          })
+        });
+
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        storedUser.location = locationStr;
+        storedUser.coordinates = { lat: latitude, lng: longitude };
+        localStorage.setItem("user", JSON.stringify(storedUser));
+        
+        console.log("PlayMate: Precise location saved.");
+      } catch (err) {
+        console.error("Google Geo error:", err);
+      }
+    });
+  };
+
   // 🔹 LOGIN
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5001/api/auth/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -29,6 +66,8 @@ export default function Login() {
       if (res.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
+
+        await requestLocation(data.token);
 
         navigate("/home");
       } else {
@@ -44,7 +83,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5001/api/auth/register", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -71,7 +110,7 @@ export default function Login() {
     if (!userEmail) return;
 
     try {
-      const res = await fetch("http://localhost:5001/api/auth/forgot-password", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

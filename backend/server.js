@@ -8,9 +8,9 @@ connectDB();
 
 const app = express();
 
-// ✅ Configure CORS
+// ✅ Configure CORS to allow any origin during development to avoid port mismatch issues
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "*", 
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"]
 }));
@@ -22,6 +22,7 @@ app.use(express.json());
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/requests", require("./routes/requestRoutes"));
+app.use("/api/arenas", require("./routes/arenaRoutes"));
 
 app.get("/", (req, res) => res.send("API running"));
 

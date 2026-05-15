@@ -3,20 +3,30 @@ const PlayRequest = require("../models/PlayRequest");
 // Send request
 const sendRequest = async (req, res) => {
   try {
-    const { receiverId, game } = req.body;
+    const { receiverId, game, arena, time, message } = req.body;
     const senderId = req.user.id;
 
-    const exists = await PlayRequest.findOne({ sender: senderId, receiver: receiverId, status: "pending" });
-    if (exists) return res.status(400).json({ message: "Request already pending" });
+    const exists = await PlayRequest.findOne({ 
+      sender: senderId, 
+      receiver: receiverId, 
+      status: "pending",
+      game
+    });
+    
+    if (exists) return res.status(400).json({ message: "Request for this game already pending" });
 
     const request = await PlayRequest.create({
       sender: senderId,
       receiver: receiverId,
-      game
+      game,
+      arena,
+      time,
+      message
     });
 
     res.json(request);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -42,6 +52,20 @@ const updateRequestStatus = async (req, res) => {
     if (request) {
       request.status = status;
       await request.save();
+
+      // ✅ ADD TO LAST CONNECTIONS IF ACCEPTED
+      if (status === "accepted") {
+        const User = require("../models/User");
+        
+        await User.findByIdAndUpdate(request.sender, {
+          $addToSet: { lastConnections: request.receiver }
+        });
+        
+        await User.findByIdAndUpdate(request.receiver, {
+          $addToSet: { lastConnections: request.sender }
+        });
+      }
+
       res.json(request);
     } else {
       res.status(404).json({ message: "Request not found" });

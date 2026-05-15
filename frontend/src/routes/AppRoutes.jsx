@@ -14,6 +14,7 @@ export default function AppRoutes() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Navigate to="/" />} />
         <Route
           path="/home"
           element={
@@ -38,6 +39,7 @@ export default function AppRoutes() {
             </Protected>
           }
         />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

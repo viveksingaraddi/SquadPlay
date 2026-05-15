@@ -11,7 +11,7 @@ export default function Requests() {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch("http://localhost:5001/api/requests/received", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/requests/received`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
@@ -27,7 +27,7 @@ export default function Requests() {
 
   const handleStatusUpdate = async (id, status) => {
     try {
-      const res = await fetch(`http://localhost:5001/api/requests/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/requests/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -58,45 +58,69 @@ export default function Requests() {
             <p className="text-gray-400">No requests received yet.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {requests.map((req) => (
-              <div key={req._id} className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold text-lg">
-                    {req.sender.name.charAt(0).toUpperCase()}
+              <div key={req._id} className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm flex flex-col gap-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-yellow-400 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-md">
+                      {req.sender.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-xl">{req.sender.name}</h3>
+                      <p className="text-gray-500 text-sm flex items-center gap-1">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/></svg>
+                        {req.sender.location}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-lg">{req.sender.name}</h3>
-                    <p className="text-gray-500 text-sm">
-                      wants to play <span className="text-orange-500 font-semibold">{req.game}</span> • {req.sender.location}
-                    </p>
+
+                  <div className="flex items-center gap-3">
+                    {req.status === "pending" ? (
+                      <>
+                        <button
+                          onClick={() => handleStatusUpdate(req._id, "accepted")}
+                          className="bg-black text-white px-8 py-3 rounded-2xl font-bold hover:opacity-90 transition shadow-lg shadow-gray-200"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => handleStatusUpdate(req._id, "declined")}
+                          className="bg-gray-100 text-gray-600 px-8 py-3 rounded-2xl font-bold hover:bg-gray-200 transition"
+                        >
+                          Decline
+                        </button>
+                      </>
+                    ) : (
+                      <span className={`px-6 py-2 rounded-full text-sm font-bold capitalize ${
+                        req.status === "accepted" ? "bg-[#e8fbf7] text-[#1ebc9c]" : "bg-red-50 text-red-500"
+                      }`}>
+                        {req.status}
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  {req.status === "pending" ? (
-                    <>
-                      <button
-                        onClick={() => handleStatusUpdate(req._id, "accepted")}
-                        className="bg-black text-white px-6 py-2.5 rounded-2xl font-semibold hover:opacity-90 transition"
-                      >
-                        Accept
-                      </button>
-                      <button
-                        onClick={() => handleStatusUpdate(req._id, "declined")}
-                        className="bg-gray-100 text-gray-600 px-6 py-2.5 rounded-2xl font-semibold hover:bg-gray-200 transition"
-                      >
-                        Decline
-                      </button>
-                    </>
-                  ) : (
-                    <span className={`px-4 py-2 rounded-full text-sm font-semibold capitalize ${
-                      req.status === "accepted" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
-                    }`}>
-                      {req.status}
-                    </span>
-                  )}
+                <div className="grid grid-cols-2 gap-4 bg-[#f8f8f8] p-6 rounded-3xl">
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Game</p>
+                    <p className="font-semibold text-gray-800">{req.game}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Time</p>
+                    <p className="font-semibold text-gray-800">{req.time}</p>
+                  </div>
+                  <div className="col-span-2 mt-2 pt-2 border-t border-gray-200">
+                    <p className="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Arena</p>
+                    <p className="font-semibold text-gray-800">{req.arena}</p>
+                  </div>
                 </div>
+
+                {req.message && (
+                  <div className="px-4 border-l-4 border-orange-200 italic text-gray-600 text-sm">
+                    "{req.message}"
+                  </div>
+                )}
               </div>
             ))}
           </div>

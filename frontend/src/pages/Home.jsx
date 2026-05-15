@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 
 export default function Home() {
-  const [currentUser, setCurrentUser] = useState(null);
   const [players, setPlayers] = useState([]);
   const [filters, setFilters] = useState({
     search: "",
@@ -11,22 +10,47 @@ export default function Home() {
     location: "Anywhere"
   });
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
-    }
-    fetchPlayers();
-  }, []);
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [arenas, setArenas] = useState([]);
+  const [requestData, setRequestData] = useState({
+    game: "",
+    arena: "",
+    time: "",
+    message: ""
+  });
 
   useEffect(() => {
     fetchPlayers();
   }, [filters]);
 
+  // Fetch arenas when selected player changes
+  useEffect(() => {
+    const fetchArenas = async () => {
+      if (selectedPlayer?.location) {
+        try {
+          // Attempt to extract city from location string
+          const parts = selectedPlayer.location.split(",");
+          const city = parts.length > 1 ? parts[parts.length - 2].trim() : parts[0].trim();
+          
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/arenas/search?city=${city}`);
+          const data = await res.json();
+          if (res.ok) setArenas(data);
+        } catch (error) {
+          console.error("Error fetching arenas:", error);
+        }
+      } else {
+        setArenas([]);
+      }
+    };
+    fetchArenas();
+  }, [selectedPlayer]);
+
   const fetchPlayers = async () => {
     try {
       const { search, game, skill, location } = filters;
-      let url = `http://localhost:5001/api/users?name=${search}&game=${game}&skill=${skill}&location=${location}`;
+      let url = `${import.meta.env.VITE_API_URL}/api/users?name=${search}&game=${game}&skill=${skill}&location=${location}`;
       
       const res = await fetch(url, {
         headers: {
@@ -40,19 +64,35 @@ export default function Home() {
     }
   };
 
-  const handleSendRequest = async (receiverId, game) => {
+  const openRequestModal = (player) => {
+    setSelectedPlayer(player);
+    setRequestData({
+      game: player.preferredGames[0] || "",
+      arena: "",
+      time: "",
+      message: ""
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSendRequest = async (e) => {
+    e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5001/api/requests/send", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/requests/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`
         },
-        body: JSON.stringify({ receiverId, game: game || "General" })
+        body: JSON.stringify({ 
+          receiverId: selectedPlayer._id, 
+          ...requestData 
+        })
       });
       const data = await res.json();
       if (res.ok) {
-        alert("Request sent!");
+        alert("Request sent successfully!");
+        setIsModalOpen(false);
       } else {
         alert(data.message);
       }
@@ -118,16 +158,13 @@ export default function Home() {
           </div>
 
           <div className="w-1/4">
-            <select
+            <input
+              type="text"
+              placeholder="Filter by city/location"
               className="w-full px-4 py-3 bg-[#f8f8f8] rounded-2xl border-none focus:ring-2 focus:ring-orange-500 appearance-none"
-              value={filters.location}
-              onChange={(e) => setFilters({ ...filters, location: e.target.value })}
-            >
-              <option>Anywhere</option>
-              <option>Koramangala, Bangalore</option>
-              <option>HSR Layout, Bangalore</option>
-              <option>Indiranagar, Bangalore</option>
-            </select>
+              value={filters.location === "Anywhere" ? "" : filters.location}
+              onChange={(e) => setFilters({ ...filters, location: e.target.value || "Anywhere" })}
+            />
           </div>
         </div>
       </div>
@@ -173,7 +210,7 @@ export default function Home() {
               </div>
 
               <button
-                onClick={() => handleSendRequest(player._id, player.preferredGames[0])}
+                onClick={() => openRequestModal(player)}
                 className="w-full bg-gradient-to-r from-[#ff8c37] to-[#ffc33d] text-white font-bold py-4 rounded-2xl shadow-lg shadow-orange-200 hover:opacity-90 transition transform active:scale-[0.98]"
               >
                 Send play request
@@ -183,9 +220,85 @@ export default function Home() {
         ))}
       </div>
       
-      {players.length === 0 && (
-        <div className="text-center py-20">
-          <p className="text-gray-400 text-lg">No players found matching your criteria.</p>
+      {/* REQUEST MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
+          <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 relative animate-in fade-in zoom-in duration-300">
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-6 right-8 text-gray-400 hover:text-black transition"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <h2 className="text-2xl font-bold mb-2">Request to Play</h2>
+            <p className="text-gray-500 mb-8 italic">With {selectedPlayer?.name}</p>
+
+            <form onSubmit={handleSendRequest} className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Game Arena</label>
+                <select 
+                  required
+                  className="w-full px-4 py-3 bg-[#f8f8f8] border-none rounded-2xl focus:ring-2 focus:ring-orange-500 appearance-none"
+                  value={requestData.arena}
+                  onChange={(e) => setRequestData({...requestData, arena: e.target.value})}
+                >
+                  <option value="">Select Arena</option>
+                  {arenas.length > 0 ? (
+                    arenas.map(arena => (
+                      <option key={arena._id} value={`${arena.name} (${arena.address})`}>{arena.name} ({arena.address})</option>
+                    ))
+                  ) : (
+                    <option disabled>No arenas found nearby</option>
+                  )}
+                  <option value="custom">Decide in chat</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Game</label>
+                  <select 
+                    required
+                    className="w-full px-4 py-3 bg-[#f8f8f8] border-none rounded-2xl focus:ring-2 focus:ring-orange-500 appearance-none"
+                    value={requestData.game}
+                    onChange={(e) => setRequestData({...requestData, game: e.target.value})}
+                  >
+                    {selectedPlayer?.preferredGames.map(g => (
+                      <option key={g} value={g}>{g}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Time</label>
+                  <input 
+                    type="time"
+                    required
+                    className="w-full px-4 py-3 bg-[#f8f8f8] border-none rounded-2xl focus:ring-2 focus:ring-orange-500"
+                    value={requestData.time}
+                    onChange={(e) => setRequestData({...requestData, time: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Message (Optional)</label>
+                <textarea 
+                  placeholder="Hey, let's play a friendly match!"
+                  className="w-full px-4 py-3 bg-[#f8f8f8] border-none rounded-2xl focus:ring-2 focus:ring-orange-500 h-24"
+                  value={requestData.message}
+                  onChange={(e) => setRequestData({...requestData, message: e.target.value})}
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-[#ff8c37] to-[#ffc33d] text-white font-bold py-4 rounded-2xl shadow-lg shadow-orange-200 hover:opacity-90 transition transform active:scale-[0.98] mt-4"
+              >
+                Confirm Request
+              </button>
+            </form>
+          </div>
         </div>
       )}
 

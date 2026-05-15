@@ -21,7 +21,9 @@ const getUsers = async (req, res) => {
 // Get current user
 const getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id)
+      .select("-password")
+      .populate("lastConnections", "name location skillLevel preferredGames");
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: "Server error" });

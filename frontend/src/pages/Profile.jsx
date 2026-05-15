@@ -20,7 +20,7 @@ export default function Profile() {
 
   const fetchUser = async () => {
     try {
-      const res = await fetch("http://localhost:5001/api/users/me", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/me`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
@@ -37,7 +37,7 @@ export default function Profile() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5001/api/users/profile", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -73,6 +73,7 @@ export default function Profile() {
           <p className="text-gray-500 mb-8">Update your preferences and availability.</p>
           
           <form onSubmit={handleUpdate} className="space-y-6">
+            {/* Form fields here */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Name</label>
               <input
@@ -127,7 +128,7 @@ export default function Profile() {
                     type="button"
                     onClick={() => handleGameToggle(game)}
                     className={`px-5 py-2.5 rounded-full text-sm font-medium transition ${
-                      user.preferredGames.includes(game) 
+                      user.preferredGames?.includes(game) 
                         ? "bg-black text-white" 
                         : "bg-[#f0f0f0] text-gray-600 hover:bg-gray-200"
                     }`}
@@ -145,7 +146,37 @@ export default function Profile() {
               Save Profile
             </button>
           </form>
+          
+          {/* ✅ LAST CONNECTIONS SECTION */}
+          <div className="mt-12 pt-8 border-t border-gray-100">
+            <h2 className="text-2xl font-bold mb-6">Last Connections</h2>
+            {user.lastConnections && user.lastConnections.length > 0 ? (
+              <div className="space-y-4">
+                {user.lastConnections.map((connection) => (
+                  <div key={connection._id} className="flex items-center gap-4 bg-[#f8f8f8] p-4 rounded-2xl border border-gray-100">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                      {connection.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold">{connection.name}</h3>
+                      <p className="text-sm text-gray-500">{connection.location || "Location unknown"}</p>
+                    </div>
+                    <div className="hidden md:flex flex-wrap gap-1 justify-end">
+                      {connection.preferredGames?.map((game, i) => (
+                        <span key={i} className="bg-white text-gray-600 text-[10px] px-2 py-1 rounded-full border border-gray-200">
+                          {game}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 italic">You haven't played with anyone yet. Head to the home page to find partners!</p>
+            )}
+          </div>
         </div>
+
       </div>
     </div>
   );
