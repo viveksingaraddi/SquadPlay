@@ -33,7 +33,7 @@ export default function Home() {
           // Attempt to extract city from location string
           const parts = selectedPlayer.location.split(",");
           const city = parts.length > 1 ? parts[parts.length - 2].trim() : parts[0].trim();
-          
+
           const API_URL = import.meta.env.VITE_API_URL || "";
           const res = await fetch(`${API_URL}/api/arenas/search?city=${city}`);
           const data = await res.json();
@@ -53,7 +53,7 @@ export default function Home() {
       const { search, game, skill, location } = filters;
       const API_URL = import.meta.env.VITE_API_URL || "";
       let url = `${API_URL}/api/users?name=${search}&game=${game}&skill=${skill}&location=${location}`;
-      
+
       const res = await fetch(url, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -89,9 +89,9 @@ export default function Home() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`
         },
-        body: JSON.stringify({ 
-          receiverId: selectedPlayer._id, 
-          ...requestData 
+        body: JSON.stringify({
+          receiverId: selectedPlayer._id,
+          ...requestData
         })
       });
       const data = await res.json();
@@ -112,7 +112,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="px-12 py-10">
-        <h1 className="text-4xl font-bold tracking-tight mb-2">Find your next partner</h1>
+        <h1 className="text-4xl font-bold tracking-tight mb-2">Find your game partner</h1>
         <p className="text-gray-500">{players.length} players match your filters.</p>
       </div>
 
@@ -122,7 +122,7 @@ export default function Home() {
           <div className="flex gap-4">
             <div className="flex-1 relative">
               <span className="absolute left-4 top-3.5 text-gray-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               </span>
               <input
                 type="text"
@@ -132,7 +132,7 @@ export default function Home() {
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               />
             </div>
-            
+
             <div className="w-1/4">
               <select
                 className="w-full px-4 py-3 bg-[#f8f8f8] rounded-2xl border-none focus:ring-2 focus:ring-orange-500 appearance-none"
@@ -185,7 +185,7 @@ export default function Home() {
               <div className="flex-1">
                 <h3 className="text-xl font-bold">{player.name}</h3>
                 <p className="text-gray-400 text-sm flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/></svg>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
                   {player.location || "Location not set"}
                 </p>
               </div>
@@ -224,16 +224,16 @@ export default function Home() {
           </div>
         ))}
       </div>
-      
+
       {/* REQUEST MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
           <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 relative animate-in fade-in zoom-in duration-300">
-            <button 
+            <button
               onClick={() => setIsModalOpen(false)}
               className="absolute top-6 right-8 text-gray-400 hover:text-black transition"
             >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
 
             <h2 className="text-2xl font-bold mb-2">Request to Play</h2>
@@ -242,11 +242,11 @@ export default function Home() {
             <form onSubmit={handleSendRequest} className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Game Arena</label>
-                <select 
+                <select
                   required
                   className="w-full px-4 py-3 bg-[#f8f8f8] border-none rounded-2xl focus:ring-2 focus:ring-orange-500 appearance-none"
                   value={requestData.arena}
-                  onChange={(e) => setRequestData({...requestData, arena: e.target.value})}
+                  onChange={(e) => setRequestData({ ...requestData, arena: e.target.value })}
                 >
                   <option value="">Select Arena</option>
                   {arenas.length > 0 ? (
@@ -263,11 +263,11 @@ export default function Home() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Game</label>
-                  <select 
+                  <select
                     required
                     className="w-full px-4 py-3 bg-[#f8f8f8] border-none rounded-2xl focus:ring-2 focus:ring-orange-500 appearance-none"
                     value={requestData.game}
-                    onChange={(e) => setRequestData({...requestData, game: e.target.value})}
+                    onChange={(e) => setRequestData({ ...requestData, game: e.target.value })}
                   >
                     {selectedPlayer?.preferredGames.map(g => (
                       <option key={g} value={g}>{g}</option>
@@ -276,23 +276,23 @@ export default function Home() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Time</label>
-                  <input 
+                  <input
                     type="time"
                     required
                     className="w-full px-4 py-3 bg-[#f8f8f8] border-none rounded-2xl focus:ring-2 focus:ring-orange-500"
                     value={requestData.time}
-                    onChange={(e) => setRequestData({...requestData, time: e.target.value})}
+                    onChange={(e) => setRequestData({ ...requestData, time: e.target.value })}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Message (Optional)</label>
-                <textarea 
+                <textarea
                   placeholder="Hey, let's play a friendly match!"
                   className="w-full px-4 py-3 bg-[#f8f8f8] border-none rounded-2xl focus:ring-2 focus:ring-orange-500 h-24"
                   value={requestData.message}
-                  onChange={(e) => setRequestData({...requestData, message: e.target.value})}
+                  onChange={(e) => setRequestData({ ...requestData, message: e.target.value })}
                 />
               </div>
 
