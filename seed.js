@@ -44,7 +44,7 @@ const seedUsers = async () => {
     const firstNames = ["Rahul", "Priya", "Amit", "Sneha", "Suresh", "Anita", "Vikram", "Deepa", "Kiran", "Meghna", "Arjun", "Sonal", "Rohan", "Pooja", "Kartik", "Shweta", "Abhishek", "Kavya", "Manish", "Divya", "Sanjay", "Ritu", "Nikhil", "Asha", "Pranav", "Leela", "Varun", "Nehal", "Aditya", "Tanya", "Harish", "Preeti", "Sunil", "Monica", "Ravi", "Simran", "Vijay", "Anjali", "Omkar", "Ishani"];
     const lastNames = ["Sharma", "Das", "Kumar", "Reddy", "Babu", "Patel", "Singh", "Nair", "Iyer", "Gupte", "Verma", "Joshi", "Malhotra", "Rao", "Shetty", "Desai", "Bose", "Menon", "Chopra", "Thakur"];
 
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 15; i++) {
       const fName = firstNames[i % firstNames.length];
       const lName = lastNames[i % lastNames.length];
       const name = `${fName} ${lName}`;

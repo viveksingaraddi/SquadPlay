@@ -1,9 +1,15 @@
 import badmintonImg from "../assets/badminton.jpg";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/home");
+    }
+  }, [navigate]);
 
   const [isSignup, setIsSignup] = useState(false);
 
